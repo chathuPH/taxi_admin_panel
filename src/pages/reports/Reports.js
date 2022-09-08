@@ -1,34 +1,33 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import "../dashboard/Dashboard.scss";
+import Tab from "react-bootstrap/Tab";
+import Tabs from "react-bootstrap/Tabs";
+
+import SalesRpt from "./components/SalesRpt";
+import BookingsRpt from "./components/BookingsRpt";
+import BranchesRpt from "./components/BranchesRpt";
+import DriversRpt from "./components/DriversRpt";
 
 const Reports = () => {
   return (
-    <div className="container mt-5">
-      <div className="row ">
-        <Link
-          className="col-sm-6 "
-          to="/branches"
-          style={{ textDecoration: "none" }}
-        >
-          <div className="card text-center text-white bg-dark mt-5">
-            <div className="card-body" id="link">
-              <h5 className="card-title">Sales Report</h5>
-            </div>
-          </div>
-        </Link>
-        <Link
-          className="col-sm-6"
-          to="/windrows"
-          style={{ textDecoration: "none" }}
-        >
-          <div className="card text-center text-white bg-dark mt-5">
-            <div className="card-body" id="link">
-              <h5 className="card-title">Bookings Report</h5>
-            </div>
-          </div>
-        </Link>
-      </div>
+    <div className="container">
+      <br />
+      <h2>Reports</h2>
+      <br />
+      <Tabs defaultActiveKey="sales" id="Reports" className="mb-3" fill>
+        <Tab eventKey="sales" title="Sales">
+          <SalesRpt />
+        </Tab>
+        <Tab eventKey="bookings" title="Bookings">
+          <BookingsRpt />
+        </Tab>
+        <Tab eventKey="branches" title="Branches">
+          <BranchesRpt />
+        </Tab>
+        <Tab eventKey="drivers" title="Drivers">
+          <DriversRpt />
+        </Tab>
+      </Tabs>
     </div>
   );
 };
