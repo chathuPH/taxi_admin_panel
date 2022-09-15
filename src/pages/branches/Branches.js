@@ -46,14 +46,14 @@ const tableIcons = {
 };
 
 const api = axios.create({
-  baseURL: `http://localhost:5000/feedstock`,
+  baseURL: `http://localhost:8080/api/v1/branch/`,
 });
 
 const Branches=()=> {
   var columns = [
     {
       title: "ID",
-      field: "_id",
+      field: "id",
       hidden: true,
       editable: "never",
       headerStyle: {
@@ -62,9 +62,24 @@ const Branches=()=> {
       },
     },
     {
-      title: "BRNO",
-      field: "BRNO",
-      editable: "never",
+      title: "Branch Name",
+      field: "brnachName",
+      headerStyle: {
+        backgroundColor: "#00994d",
+        color: "#FFF",
+      },
+    },
+    {
+      title: "Contact No",
+      field: "contactNo",
+      headerStyle: {
+        backgroundColor: "#00994d",
+        color: "#FFF",
+      },
+    },
+    {
+      title: "Location",
+      field: "location",
       headerStyle: {
         backgroundColor: "#00994d",
         color: "#FFF",
@@ -77,11 +92,79 @@ const Branches=()=> {
   const [iserror, setIserror] = useState(false);
   const [errorMessages, setErrorMessages] = useState([]);
 
-  const AddRow = (newData, resolve) => {};
+  let config={
+    headers:{
+      "Access-Control-Allow-Origin":"*"
+    }
+  }
 
-  const UpdateRow = (newData, oldData, resolve) => {};
+  useEffect(()=>{
+    api
+    .get("/findAll")
+    .then((res) => {
+      console.log(res)
+      setData(res.data);
+    })
+    .catch((error) => {
+      console.log("Error");
+    });
+  },[])
 
-  const DeleteRow = (oldData, resolve) => {};
+  const AddRow = (newData, resolve) => {
+    newData.branchName=newData.brnachName
+    api
+    .post("/create", newData)
+    .then((res) => {
+      let dataToAdd = [...data];
+      dataToAdd.push(newData);
+      setData(dataToAdd);
+      resolve();
+      setErrorMessages([]);
+      setIserror(false);
+    })
+    .catch((error) => {
+      setErrorMessages(["Branch creation failed"]);
+      setIserror(true);
+      resolve();
+    });
+  }
+
+  const UpdateRow = (newData, oldData, resolve) => {
+    newData.branchName=newData.brnachName
+    api
+    .put("/update", newData)
+    .then((res) => {
+      const dataUpdate = [...data];
+          const index = oldData.tableData.id;
+          dataUpdate[index] = newData;
+          setData([...dataUpdate]);
+          resolve();
+          setIserror(false);
+          setErrorMessages([]);
+    })
+    .catch((error) => {
+      setErrorMessages(["Branch update failed"]);
+      setIserror(true);
+      resolve();
+    });
+  };
+
+  const DeleteRow = (oldData, resolve) => {
+    api
+    .delete("/delete?id=" + oldData.id)
+    .then((res) => {
+      const dataDelete = [...data];
+      const index = oldData.tableData.id;
+      dataDelete.splice(index, 1);
+      setData([...dataDelete]);
+      resolve();
+    })
+    .catch((error) => {
+      setErrorMessages(["Delete failed!"]);
+      setIserror(true);
+      resolve();
+    });
+  };
 
   return (
     <div className="container mt-5">
