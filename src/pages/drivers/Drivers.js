@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { forwardRef } from "react";
 import Grid from "@material-ui/core/Grid";
+import CreateDriverModal from "../../components/create-driver-modal/CreateDriverModal";
 
 import MaterialTable from "material-table";
 import AddBox from "@material-ui/icons/AddBox";
@@ -46,14 +47,14 @@ const tableIcons = {
 };
 
 const api = axios.create({
-  baseURL: `http://localhost:5000/feedstock`,
+  baseURL: `http://localhost:8080/api/v1`,
 });
 
 const Drivers=()=> {
   var columns = [
     {
       title: "ID",
-      field: "_id",
+      field: "id",
       hidden: true,
       editable: "never",
       headerStyle: {
@@ -62,9 +63,34 @@ const Drivers=()=> {
       },
     },
     {
-      title: "DNO",
-      field: "DNO",
-      editable: "never",
+      title: "Name",
+      field: "driverName",
+      headerStyle: {
+        backgroundColor: "#00994d",
+        color: "#FFF",
+      },
+    },
+    {
+      title: "Username",
+      field: "username",
+      headerStyle: {
+        backgroundColor: "#00994d",
+        color: "#FFF",
+      },
+    },
+    {
+      title: "Branch",
+      field: "branch",
+      editable:"never",
+      headerStyle: {
+        backgroundColor: "#00994d",
+        color: "#FFF",
+      },
+      render:data=>data.branch?.brnachName
+    },
+    {
+      title: "Status",
+      field: "status",
       headerStyle: {
         backgroundColor: "#00994d",
         color: "#FFF",
@@ -72,17 +98,62 @@ const Drivers=()=> {
     },
   ];
   const [data, setData] = useState([]); //table data
+  const [ischange, setIsChange] = useState(false);
+
+  const [createModalShow,setCreateModalShow]=useState(false)
 
   //for error handling
   const [iserror, setIserror] = useState(false);
   const [errorMessages, setErrorMessages] = useState([]);
 
-  const AddRow = (newData, resolve) => {};
+  useEffect(()=>{
+    api
+    .get("/driver/findAll")
+    .then((res) => {
+      console.log(res)
+      setData(res.data);
+    })
+    .catch((error) => {
+      console.log("Error");
+    });
+  },[ischange,createModalShow])
 
-  const UpdateRow = (newData, oldData, resolve) => {};
+  const UpdateRow = (newData, oldData, resolve) => {
+    setIsChange(false);
+    newData.driverId=newData.id
+    newData.branchId=newData.branch.id
+    newData.type="driver"
+    api
+    .put("/driver/update", newData)
+    .then((res) => {
+      setIsChange(true);
+      setIserror(false);
+      setErrorMessages([]);
+      resolve();
+    })
+    .catch((error) => {
+      setErrorMessages(["Driver update failed"]);
+      setIserror(true);
+      resolve();
+    });
+  };
 
-  const DeleteRow = (oldData, resolve) => {};
-
+  const DeleteRow = (oldData, resolve) => {
+    setIsChange(false);
+    api
+    .delete("/driver/delete?id=" + oldData.id)
+    .then((res) => {
+      setIsChange(true)
+      setIserror(false);
+      setErrorMessages([]);
+      resolve();
+    })
+    .catch((error) => {
+      setErrorMessages(["Delete failed!"]);
+      setIserror(true);
+      resolve();
+    });
+  };
   return (
     <div className="container mt-5">
       <div className="App">
@@ -107,14 +178,18 @@ const Drivers=()=> {
                 exportButton: true,
               }}
               icons={tableIcons}
+              actions={[
+                {
+                  icon: AddBox,
+                  tooltip: 'Add User',
+                  isFreeAction: true,
+                  onClick: () => setCreateModalShow(true)
+                },
+              ]}
               editable={{
                 onRowUpdate: (newData, oldData) =>
                   new Promise((resolve) => {
                     UpdateRow(newData, oldData, resolve);
-                  }),
-                onRowAdd: (newData) =>
-                  new Promise((resolve) => {
-                    AddRow(newData, resolve);
                   }),
                 onRowDelete: (oldData) =>
                   new Promise((resolve) => {
@@ -123,7 +198,10 @@ const Drivers=()=> {
               }}
             />
           </Grid>
-          <Grid item xs={3}></Grid>
+          <CreateDriverModal
+            show={createModalShow}
+            onHide={() => setCreateModalShow(false)}
+          />
         </Grid>
       </div>
       <br></br>

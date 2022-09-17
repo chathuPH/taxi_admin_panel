@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { forwardRef } from "react";
 import Grid from "@material-ui/core/Grid";
 
+import CreateVehicleModal from "../../components/create-vehicle-modal/CreateVehicleModal";
+
 import MaterialTable from "material-table";
 import AddBox from "@material-ui/icons/AddBox";
 import ArrowDownward from "@material-ui/icons/ArrowDownward";
@@ -46,14 +48,14 @@ const tableIcons = {
 };
 
 const api = axios.create({
-  baseURL: `http://localhost:5000/feedstock`,
+  baseURL: `http://localhost:8080/api/v1`,
 });
 
 const Vehicles=()=> {
   var columns = [
     {
       title: "ID",
-      field: "_id",
+      field: "id",
       hidden: true,
       editable: "never",
       headerStyle: {
@@ -62,9 +64,54 @@ const Vehicles=()=> {
       },
     },
     {
-      title: "VNO",
-      field: "VNO",
+      title: "Vehicle Name",
+      field: "vehicleName",
+      headerStyle: {
+        backgroundColor: "#00994d",
+        color: "#FFF",
+      },
+    },
+    {
+      title: "Vehicle #",
+      field: "numberPlate",
+      headerStyle: {
+        backgroundColor: "#00994d",
+        color: "#FFF",
+      },
+    },
+    {
+      title: "Category",
+      field: "category",
       editable: "never",
+      headerStyle: {
+        backgroundColor: "#00994d",
+        color: "#FFF",
+      },
+      render:data=>data.category?.categoryName
+    },
+    {
+      title: "Driver",
+      field: "driver",
+      editable: "never",
+      headerStyle: {
+        backgroundColor: "#00994d",
+        color: "#FFF",
+      },
+      render:data=>data.driver?.driverName
+    },
+    {
+      title: "Branch",
+      field: "branch",
+      editable: "never",
+      headerStyle: {
+        backgroundColor: "#00994d",
+        color: "#FFF",
+      },
+      render:data=>data.branch?.brnachName
+    },
+    {
+      title: "Status",
+      field: "status",
       headerStyle: {
         backgroundColor: "#00994d",
         color: "#FFF",
@@ -72,16 +119,60 @@ const Vehicles=()=> {
     },
   ];
   const [data, setData] = useState([]); //table data
+  const [ischange, setIsChange] = useState(false);
+
+  const [createModalShow,setCreateModalShow]=useState(false)
 
   //for error handling
   const [iserror, setIserror] = useState(false);
   const [errorMessages, setErrorMessages] = useState([]);
 
-  const AddRow = (newData, resolve) => {};
+  useEffect(()=>{
+    api
+    .get("/vehicle/findAll")
+    .then((res) => {
+      setData(res.data);
+    })
+    .catch((error) => {
+      console.log("Error");
+    });
+  },[ischange,createModalShow])
 
-  const UpdateRow = (newData, oldData, resolve) => {};
+  const UpdateRow = (newData, oldData, resolve) => {
+    setIsChange(false)
+    const copyData={id:newData.id,vehicleName:newData.vehicleName,numberPlate:newData.numberPlate,status:newData.status,driver:newData.driver?.id,branch:newData.branch?.id,
+      category:newData.category?.id}
+    api
+      .put("/vehicle/update", copyData)
+      .then((res) => {
+        setIsChange(true);
+        setIserror(false);
+        setErrorMessages([]);
+        resolve();
+      })
+      .catch((error) => {
+        setErrorMessages(["Branch update failed"]);
+        setIserror(true);
+        resolve();
+      });
+  };
 
-  const DeleteRow = (oldData, resolve) => {};
+  const DeleteRow = (oldData, resolve) => {
+    setIsChange(false)
+    api
+      .delete("/vehicle/delete?id=" + oldData.id)
+      .then((res) => {
+        setIsChange(true)
+        setIserror(false);
+        setErrorMessages([]);
+        resolve();
+      })
+      .catch((error) => {
+        setErrorMessages(["Delete failed!"]);
+        setIserror(true);
+        resolve();
+      });
+  };
 
   return (
     <div className="container mt-5">
@@ -107,14 +198,18 @@ const Vehicles=()=> {
                 exportButton: true,
               }}
               icons={tableIcons}
+              actions={[
+                {
+                  icon: AddBox,
+                  tooltip: 'Add User',
+                  isFreeAction: true,
+                  onClick: () => setCreateModalShow(true)
+                },
+              ]}
               editable={{
                 onRowUpdate: (newData, oldData) =>
                   new Promise((resolve) => {
                     UpdateRow(newData, oldData, resolve);
-                  }),
-                onRowAdd: (newData) =>
-                  new Promise((resolve) => {
-                    AddRow(newData, resolve);
                   }),
                 onRowDelete: (oldData) =>
                   new Promise((resolve) => {
@@ -123,7 +218,10 @@ const Vehicles=()=> {
               }}
             />
           </Grid>
-          <Grid item xs={3}></Grid>
+          <CreateVehicleModal
+            show={createModalShow}
+            onHide={() => setCreateModalShow(false)}
+          />
         </Grid>
       </div>
       <br></br>

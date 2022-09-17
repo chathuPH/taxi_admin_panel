@@ -83,7 +83,6 @@ const Categories=()=> {
     api
     .get("/findAll")
     .then((res) => {
-      console.log(res)
       setData(res.data);
     })
     .catch((error) => {
