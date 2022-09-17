@@ -49,7 +49,7 @@ const api = axios.create({
   baseURL: `http://localhost:8080/api/v1/branch/`,
 });
 
-const Branches=()=> {
+const Branches = () => {
   var columns = [
     {
       title: "ID",
@@ -87,83 +87,74 @@ const Branches=()=> {
     },
   ];
   const [data, setData] = useState([]); //table data
+  const [ischange, setIsChange] = useState(false);
 
   //for error handling
   const [iserror, setIserror] = useState(false);
   const [errorMessages, setErrorMessages] = useState([]);
 
-  let config={
-    headers:{
-      "Access-Control-Allow-Origin":"*"
-    }
-  }
-
-  useEffect(()=>{
+  useEffect(() => {
     api
-    .get("/findAll")
-    .then((res) => {
-      console.log(res)
-      setData(res.data);
-    })
-    .catch((error) => {
-      console.log("Error");
-    });
-  },[])
+      .get("/findAll")
+      .then((res) => {
+        setData(res.data);
+      })
+      .catch((error) => {
+        console.log("Error");
+      });
+  }, [ischange]);
 
   const AddRow = (newData, resolve) => {
-    newData.branchName=newData.brnachName
+    setIsChange(false);
+    newData.branchName = newData.brnachName;
     api
-    .post("/create", newData)
-    .then((res) => {
-      let dataToAdd = [...data];
-      dataToAdd.push(newData);
-      setData(dataToAdd);
-      resolve();
-      setErrorMessages([]);
-      setIserror(false);
-    })
-    .catch((error) => {
-      setErrorMessages(["Branch creation failed"]);
-      setIserror(true);
-      resolve();
-    });
-  }
+      .post("/create", newData)
+      .then((res) => {
+        setIsChange(true);
+        setErrorMessages([]);
+        setIserror(false);
+        resolve();
+      })
+      .catch((error) => {
+        setErrorMessages(["Branch creation failed"]);
+        setIserror(true);
+        resolve();
+      });
+  };
 
   const UpdateRow = (newData, oldData, resolve) => {
-    newData.branchName=newData.brnachName
+    setIsChange(false)
+    newData.branchName = newData.brnachName;
     api
-    .put("/update", newData)
-    .then((res) => {
-      const dataUpdate = [...data];
-          const index = oldData.tableData.id;
-          dataUpdate[index] = newData;
-          setData([...dataUpdate]);
-          resolve();
-          setIserror(false);
-          setErrorMessages([]);
-    })
-    .catch((error) => {
-      setErrorMessages(["Branch update failed"]);
-      setIserror(true);
-      resolve();
-    });
+      .put("/update", newData)
+      .then((res) => {
+        setIsChange(true);
+        setIserror(false);
+        setErrorMessages([]);
+        resolve();
+      })
+      .catch((error) => {
+        setErrorMessages(["Branch update failed"]);
+        setIserror(true);
+        resolve();
+      });
   };
 
   const DeleteRow = (oldData, resolve) => {
+    setIsChange(false)
     api
-    .delete("/delete?id=" + oldData.id)
-    .then((res) => {
-      const dataDelete = [...data];
-      const index = oldData.tableData.id;
-      dataDelete.splice(index, 1);
-      setData([...dataDelete]);
-      resolve();
-    })
-    .catch((error) => {
-      setErrorMessages(["Delete failed!"]);
-      setIserror(true);
-      resolve();
-    });
+      .delete("/delete?id=" + oldData.id)
+      .then((res) => {
+        setIsChange(true)
+        setIserror(false);
+        setErrorMessages([]);
+        resolve();
+      })
+      .catch((error) => {
+        setErrorMessages(["Delete failed!"]);
+        setIserror(true);
+        resolve();
+      });
   };
 
   return (
@@ -214,6 +205,6 @@ const Branches=()=> {
       <br></br>
     </div>
   );
-}
+};
 
 export default Branches;

@@ -73,6 +73,7 @@ const Categories=()=> {
     
   ];
   const [data, setData] = useState([]); //table data
+  const [ischange, setIsChange] = useState(false);
 
   //for error handling
   const [iserror, setIserror] = useState(false);
@@ -88,18 +89,17 @@ const Categories=()=> {
     .catch((error) => {
       console.log("Error");
     });
-  },[])
+  },[ischange])
 
   const AddRow = (newData, resolve) => {
+    setIsChange(false);
     api
     .post("/create", newData)
     .then((res) => {
-      let dataToAdd = [...data];
-      dataToAdd.push(newData);
-      setData(dataToAdd);
-      resolve();
+      setIsChange(true);
       setErrorMessages([]);
       setIserror(false);
+      resolve();
     })
     .catch((error) => {
       setErrorMessages(["Branch creation failed"]);
@@ -109,16 +109,14 @@ const Categories=()=> {
   };
 
   const UpdateRow = (newData, oldData, resolve) => {
+    setIsChange(false);
     api
     .put("/update", newData)
     .then((res) => {
-      const dataUpdate = [...data];
-          const index = oldData.tableData.id;
-          dataUpdate[index] = newData;
-          setData([...dataUpdate]);
-          resolve();
-          setIserror(false);
-          setErrorMessages([]);
+      setIsChange(true);
+      setIserror(false);
+      setErrorMessages([]);
+      resolve();
     })
     .catch((error) => {
       setErrorMessages(["Branch update failed"]);
@@ -128,13 +126,13 @@ const Categories=()=> {
   };
 
   const DeleteRow = (oldData, resolve) => {
+    setIsChange(false);
     api
     .delete("/delete?id=" + oldData.id)
     .then((res) => {
-      const dataDelete = [...data];
-      const index = oldData.tableData.id;
-      dataDelete.splice(index, 1);
-      setData([...dataDelete]);
+      setIsChange(true)
+      setIserror(false);
+      setErrorMessages([]);
       resolve();
     })
     .catch((error) => {
