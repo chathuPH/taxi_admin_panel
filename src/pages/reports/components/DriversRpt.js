@@ -79,13 +79,12 @@ const DriversRpt=()=> {
     },
     {
       title: "Branch",
-      field: "branch",
+      field: "branch.brnachName",
       editable:"never",
       headerStyle: {
         backgroundColor: "#00994d",
         color: "#FFF",
       },
-      render:data=>data.branch?.brnachName
     },
     {
       title: "Status",

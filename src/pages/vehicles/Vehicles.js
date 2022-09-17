@@ -81,33 +81,30 @@ const Vehicles=()=> {
     },
     {
       title: "Category",
-      field: "category",
+      field: "category.categoryName",
       editable: "never",
       headerStyle: {
         backgroundColor: "#00994d",
         color: "#FFF",
       },
-      render:data=>data.category?.categoryName
     },
     {
       title: "Driver",
-      field: "driver",
+      field: "driver.driverName",
       editable: "never",
       headerStyle: {
         backgroundColor: "#00994d",
         color: "#FFF",
       },
-      render:data=>data.driver?.driverName
     },
     {
       title: "Branch",
-      field: "branch",
+      field: "branch.brnachName",
       editable: "never",
       headerStyle: {
         backgroundColor: "#00994d",
         color: "#FFF",
       },
-      render:data=>data.branch?.brnachName
     },
     {
       title: "Status",
