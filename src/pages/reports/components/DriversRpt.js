@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { forwardRef } from "react";
 import Grid from "@material-ui/core/Grid";
 
@@ -46,14 +46,14 @@ const tableIcons = {
 };
 
 const api = axios.create({
-  baseURL: `http://localhost:5000/feedstock`,
+  baseURL: `http://localhost:8080/api/v1`,
 });
 
 const DriversRpt=()=> {
   var columns = [
     {
       title: "ID",
-      field: "_id",
+      field: "id",
       hidden: true,
       editable: "never",
       headerStyle: {
@@ -62,9 +62,34 @@ const DriversRpt=()=> {
       },
     },
     {
-      title: "BNO",
-      field: "BNO",
-      editable: "never",
+      title: "Name",
+      field: "driverName",
+      headerStyle: {
+        backgroundColor: "#00994d",
+        color: "#FFF",
+      },
+    },
+    {
+      title: "Username",
+      field: "username",
+      headerStyle: {
+        backgroundColor: "#00994d",
+        color: "#FFF",
+      },
+    },
+    {
+      title: "Branch",
+      field: "branch",
+      editable:"never",
+      headerStyle: {
+        backgroundColor: "#00994d",
+        color: "#FFF",
+      },
+      render:data=>data.branch?.brnachName
+    },
+    {
+      title: "Status",
+      field: "status",
       headerStyle: {
         backgroundColor: "#00994d",
         color: "#FFF",
@@ -77,11 +102,17 @@ const DriversRpt=()=> {
   const [iserror, setIserror] = useState(false);
   const [errorMessages, setErrorMessages] = useState([]);
 
-  const AddRow = (newData, resolve) => {};
-
-  const UpdateRow = (newData, oldData, resolve) => {};
-
-  const DeleteRow = (oldData, resolve) => {};
+  useEffect(()=>{
+    api
+    .get("/driver/findAll")
+    .then((res) => {
+      console.log(res)
+      setData(res.data);
+    })
+    .catch((error) => {
+      console.log("Error");
+    });
+  },[])
 
   return (
     <div className="container mt-5">
@@ -107,20 +138,6 @@ const DriversRpt=()=> {
                 exportButton: true,
               }}
               icons={tableIcons}
-              editable={{
-                onRowUpdate: (newData, oldData) =>
-                  new Promise((resolve) => {
-                    UpdateRow(newData, oldData, resolve);
-                  }),
-                onRowAdd: (newData) =>
-                  new Promise((resolve) => {
-                    AddRow(newData, resolve);
-                  }),
-                onRowDelete: (oldData) =>
-                  new Promise((resolve) => {
-                    DeleteRow(oldData, resolve);
-                  }),
-              }}
             />
           </Grid>
           <Grid item xs={3}></Grid>

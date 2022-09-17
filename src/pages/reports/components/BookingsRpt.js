@@ -77,12 +77,6 @@ const BookingsRpt=()=> {
   const [iserror, setIserror] = useState(false);
   const [errorMessages, setErrorMessages] = useState([]);
 
-  const AddRow = (newData, resolve) => {};
-
-  const UpdateRow = (newData, oldData, resolve) => {};
-
-  const DeleteRow = (oldData, resolve) => {};
-
   return (
     <div className="container mt-5">
       <div className="App">
@@ -107,23 +101,8 @@ const BookingsRpt=()=> {
                 exportButton: true,
               }}
               icons={tableIcons}
-              editable={{
-                onRowUpdate: (newData, oldData) =>
-                  new Promise((resolve) => {
-                    UpdateRow(newData, oldData, resolve);
-                  }),
-                onRowAdd: (newData) =>
-                  new Promise((resolve) => {
-                    AddRow(newData, resolve);
-                  }),
-                onRowDelete: (oldData) =>
-                  new Promise((resolve) => {
-                    DeleteRow(oldData, resolve);
-                  }),
-              }}
             />
           </Grid>
-          <Grid item xs={3}></Grid>
         </Grid>
       </div>
       <br></br>

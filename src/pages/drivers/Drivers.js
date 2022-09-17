@@ -175,7 +175,6 @@ const Drivers=()=> {
               data={data}
               options={{
                 grouping: true,
-                exportButton: true,
               }}
               icons={tableIcons}
               actions={[
