@@ -25,8 +25,8 @@ const CategoriesDropdown = (props) => {
     api
       .get("/findAll")
       .then((res) => {
-        const payload = res.data.map((branch) => {
-          return { Cid: branch.id, label: branch.categoryName };
+        const payload = res.data.map((cat) => {
+          return { Cid: cat.id, label: cat.categoryName };
         });
         setData(payload);
       })
