@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { forwardRef } from "react";
 import Grid from "@material-ui/core/Grid";
 
@@ -20,6 +20,7 @@ import Search from "@material-ui/icons/Search";
 import ViewColumn from "@material-ui/icons/ViewColumn";
 import axios from "axios";
 import Alert from "@material-ui/lab/Alert";
+import { Redirect } from "react-router-dom";
 
 const tableIcons = {
   Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -46,14 +47,15 @@ const tableIcons = {
 };
 
 const api = axios.create({
-  baseURL: `http://localhost:5000/feedstock`,
+  baseURL: `http://localhost:8080/api/v1/booking`,
 });
 
-const Bookings=()=> {
+const Bookings = () => {
+
   var columns = [
     {
       title: "ID",
-      field: "_id",
+      field: "id",
       hidden: true,
       editable: "never",
       headerStyle: {
@@ -62,8 +64,62 @@ const Bookings=()=> {
       },
     },
     {
-      title: "BNO",
-      field: "BNO",
+      title: "Source",
+      field: "source",
+      editable: "never",
+      headerStyle: {
+        backgroundColor: "#00994d",
+        color: "#FFF",
+      },
+    },
+    {
+      title: "Destination",
+      field: "destination",
+      editable: "never",
+      headerStyle: {
+        backgroundColor: "#00994d",
+        color: "#FFF",
+      },
+    },
+    {
+      title: "Distance",
+      field: "distance",
+      editable: "never",
+      headerStyle: {
+        backgroundColor: "#00994d",
+        color: "#FFF",
+      },
+    },
+    {
+      title: "Fee",
+      field: "fee",
+      editable: "never",
+      headerStyle: {
+        backgroundColor: "#00994d",
+        color: "#FFF",
+      },
+    },
+    {
+      title: "Driver",
+      field: "driver.driverName",
+      editable: "never",
+      headerStyle: {
+        backgroundColor: "#00994d",
+        color: "#FFF",
+      },
+    },
+    {
+      title: "Vehicle",
+      field: "vehicle.vehicleName",
+      editable: "never",
+      headerStyle: {
+        backgroundColor: "#00994d",
+        color: "#FFF",
+      },
+    },
+    {
+      title: "Status",
+      field: "status",
       editable: "never",
       headerStyle: {
         backgroundColor: "#00994d",
@@ -71,17 +127,25 @@ const Bookings=()=> {
       },
     },
   ];
+
+  
   const [data, setData] = useState([]); //table data
 
   //for error handling
   const [iserror, setIserror] = useState(false);
   const [errorMessages, setErrorMessages] = useState([]);
 
-  const AddRow = (newData, resolve) => {};
+  useEffect(() => {
+    api
+      .get("/findAll")
+      .then((res) => {
+        setData(res.data);
+      })
+      .catch((error) => {
+        console.log("Error");
+      });
+  }, []);
 
-  const UpdateRow = (newData, oldData, resolve) => {};
-
-  const DeleteRow = (oldData, resolve) => {};
 
   return (
     <div className="container mt-5">
@@ -99,28 +163,13 @@ const Bookings=()=> {
               )}
             </div>
             <MaterialTable
-              title="Booking Details"
+              title="Bookings"
               columns={columns}
               data={data}
               options={{
                 grouping: true,
-                exportButton: true,
               }}
               icons={tableIcons}
-              editable={{
-                onRowUpdate: (newData, oldData) =>
-                  new Promise((resolve) => {
-                    UpdateRow(newData, oldData, resolve);
-                  }),
-                onRowAdd: (newData) =>
-                  new Promise((resolve) => {
-                    AddRow(newData, resolve);
-                  }),
-                onRowDelete: (oldData) =>
-                  new Promise((resolve) => {
-                    DeleteRow(oldData, resolve);
-                  }),
-              }}
             />
           </Grid>
           <Grid item xs={3}></Grid>
@@ -131,6 +180,6 @@ const Bookings=()=> {
       <br></br>
     </div>
   );
-}
+};
 
 export default Bookings;
