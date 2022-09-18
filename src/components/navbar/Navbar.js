@@ -29,8 +29,8 @@ const Navbar=()=> {
                 <Link className="nav-link px-4" to="/categories">
                   Categories
                 </Link>
-                <Link className="nav-link px-4" to="/vehicles">
-                  Vehicles
+                <Link className="nav-link px-4" to="/drivers">
+                  Drivers
                 </Link>
 
                 <Link
@@ -40,8 +40,8 @@ const Navbar=()=> {
                   Admin Panel
                 </Link>
 
-                <Link className="nav-link px-4" to="/drivers">
-                  Drivers
+                <Link className="nav-link px-4" to="/vehicles">
+                  Vehicles
                 </Link>
                 <Link className="nav-link px-4" to="/reports">
                   Reports
